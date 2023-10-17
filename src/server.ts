@@ -6,6 +6,7 @@ let DBInstance = new Database(
 	false
 );
 
+
 const { app, server } = makeApp(DBInstance);
 
 server.listen(config.PORT, () => {
