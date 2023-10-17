@@ -10,6 +10,8 @@ function makeApp(database: Database)
 {
 	app.locals.database = database;
 
+	app.locals.database.connect()
+
 	const server = http.createServer(app);
 	app.use(express.json());
 
