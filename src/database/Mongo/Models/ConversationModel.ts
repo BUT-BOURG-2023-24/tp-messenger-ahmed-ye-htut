@@ -10,17 +10,19 @@ export interface IConversation extends Document {
 }
 
 const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
-	participants :
-	{
-		type : Schema.Types.ObjectId,
-		ref : 'User',
-		required : true,
-	},
-	messages:
-	{
-		type : Schema.Types.ObjectId,
-		ref : 'Message',
-	},
+	participants: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'User',
+			required: true,
+		}
+	],
+	messages: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Message',
+		}
+	],
 	title :
 	{
 		type: String, 
