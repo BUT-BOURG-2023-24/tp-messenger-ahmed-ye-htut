@@ -1,5 +1,6 @@
 import config from "../config";
 const mongoose = require('mongoose');
+const User = require('./Mongo/Models/UserModel');
 require('dotenv/config');
 
 class Database {
@@ -26,6 +27,36 @@ class Database {
 				.catch((error: Error) => {
 					console.error("Error while connecting to DB", error);
 				});
+		}
+	}
+
+	async  getUser(email : string) {
+
+		try
+		{
+			let user = await User.findOne({email : email});
+			return { user }
+		}
+		catch(error)
+		{
+			return { error }
+		}
+	}
+
+	async createUser(email : string,hash : string)
+	{
+		try
+		{
+			let user = new User({
+				email: email,
+				password: hash
+			});
+			user = await user.save();
+			return { user };
+		}
+		catch(error)
+		{
+			return { error };
 		}
 	}
 }
