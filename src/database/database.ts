@@ -1,6 +1,6 @@
 import config from "../config";
 const mongoose = require('mongoose');
-const User = require('./Mongo/Models/UserModel');
+import UserModel  from "./Mongo/Models/UserModel";
 require('dotenv/config');
 
 class Database {
@@ -30,11 +30,11 @@ class Database {
 		}
 	}
 
-	async  getUser(email : string) {
+	async  getUser(username : string) {
 
 		try
 		{
-			let user = await User.findOne({email : email});
+			let user = await UserModel.findOne({username : username});
 			return { user }
 		}
 		catch(error)
@@ -43,20 +43,35 @@ class Database {
 		}
 	}
 
-	async createUser(email : string,hash : string)
+	async createUser(username : string,password : string,profilePicId :string)
 	{
 		try
 		{
-			let user = new User({
-				email: email,
-				password: hash
+			let user = new UserModel({
+				username: username,
+				password: password,
+				profilePicId :profilePicId
 			});
 			user = await user.save();
 			return { user };
 		}
 		catch(error)
 		{
+			console.log(error)
 			return { error };
+		}
+	}
+
+	async  getAllUsers() {
+
+		try
+		{
+			let users = await UserModel.find({});
+			return { users }
+		}
+		catch(error)
+		{
+			return { error }
 		}
 	}
 }

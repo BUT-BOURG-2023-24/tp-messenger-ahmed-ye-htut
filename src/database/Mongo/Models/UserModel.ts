@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { MongooseID } from "../../../types";
+import {string} from "joi";
 
 export interface IUser extends Document {
 	username : string,
@@ -21,7 +22,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>({
 	},
 	profilePicId :
 	{
-		type : Schema.Types.ObjectId,
+		type : String,
 		required : true
 	}
 });

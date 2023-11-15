@@ -10,9 +10,9 @@ declare global {
 		interface Locals {
 			database: Database;
 			userId: MongooseID;
-			sockerController: SocketController;
+			socketController: SocketController;
 		}
 	}
 	var Database:Database
-	var conv: ConversationController?
+	var conv: ConversationController
 }
