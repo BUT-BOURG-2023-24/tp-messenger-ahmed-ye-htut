@@ -38,14 +38,15 @@ class Database {
 
   async getAllConversationsForUser(id: MongooseID) {
     try {
-      const allConversationsForUser = await ConversationModel.findOne({
-        _id: id,
-      }).populate({ path: "conversations", select: "_id" });
-      console.log(allConversationsForUser);
-      return { allConversationsForUser };
-    } catch (error) {
-      return { error };
-    }
+		const allConversationsForUser = await ConversationModel.find({
+		  participants: id,
+		})
+	
+		console.log(allConversationsForUser);
+		return { allConversationsForUser };
+	  } catch (error) {
+		return { error };
+	  }
   }
 
   async getConversationById(id: MongooseID) {
@@ -84,11 +85,16 @@ class Database {
         return { error: "Conversation not found" };
       }
 
-      // Assuming messages is an array in your ConversationModel
-      conversation.messages.push(messageId);
-      await conversation.save();
-
-      return { success: true };
+      if (!conversation.messages.includes(messageId)) {
+        conversation.messages.push(messageId);
+        await conversation.save();
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: "Message already added to conversation",
+        };
+      }
     } catch (error) {
       return { error };
     }
@@ -132,13 +138,13 @@ class Database {
 
   async createUser(username: string, password: string) {
     try {
-      let newUser = new UserModel({
+      let user = new UserModel({
         username,
         password,
       });
 
-      newUser = await newUser.save();
-      return { newUser };
+      user = await user.save();
+      return { user };
     } catch (error) {
       return { error };
     }
@@ -146,11 +152,11 @@ class Database {
 
   async getUserByName(username: string) {
     try {
-      const userByName = await UserModel.findOne({
+      const user = await UserModel.findOne({
         username: username,
       });
-      console.log(userByName);
-      return { userByName };
+      console.log(user);
+      return { user };
     } catch (error) {
       return { error };
     }
@@ -158,11 +164,11 @@ class Database {
 
   async getUserById(id: MongooseID) {
     try {
-      const userById = await UserModel.findOne({
+      const user = await UserModel.findOne({
         _id: id,
       });
-      console.log(userById);
-      return { userById };
+      console.log(user);
+      return { user };
     } catch (error) {
       return { error };
     }
@@ -170,11 +176,24 @@ class Database {
 
   async getUsersByIds(ids: MongooseID[]) {
     try {
-      const usersById = await UserModel.find({
+      const users = await UserModel.find({
         _id: { $in: ids },
       });
-      console.log(usersById);
-      return { usersById };
+      console.log(users);
+      return { users };
+    } catch (error) {
+      return { error };
+    }
+  }
+
+  
+  async getUsersOnline(ids: MongooseID[]) {
+    try {
+      const users = await UserModel.find({
+        _id: { $in: ids },
+      });
+      console.log(users);
+      return { users };
     } catch (error) {
       return { error };
     }
