@@ -1,57 +1,70 @@
 import * as joi from "joi";
 import { Request } from "express";
 
-interface JoiRequestValidatorResponse
-{
-	error?: string
+interface JoiRequestValidatorResponse {
+  error?: string;
 }
 
-interface JoiRouteValidator
-{
-	route: string,
-	method: string,
-	validatorSchema: joi.ObjectSchema<any>
+interface JoiRouteValidator {
+  route: string;
+  method: string;
+  validatorSchema: joi.ObjectSchema<any>;
 }
 
-class JoiRequestValidator 
-{
-	validators: JoiRouteValidator[] = 
-	[
-		// EXEMPLE
-		// {
-		// 	route: "/conversations/:id",
-		// 	method: "POST",
-		// 	validatorSchema: bodyFormat,
-		// }
-	];
+const postBodyFormat = joi.object({
+  name: joi.string().min(3).max(30).required(),
+  description: joi.string().min(3).max(200),
+  price: joi.number().min(0).required(),
+});
 
-	validate(request: Request): JoiRequestValidatorResponse 
-	{
-		// request.baseUrl contient l'URL de base, avant application des middlewares.
-		// request.route.path contient l'URL que vous déclarez dans votre middleware de routage.
-		console.log(request.baseUrl);
-		console.log(request.route.path);
+const putBodyFormat = joi
+  .object({
+    name: joi.string().min(3).max(30),
+    description: joi.string().min(3).max(200),
+    price: joi.number().min(0),
+  })
+  .or("name", "description", "price");
 
-		/* 
-			ETAPE 1:
+class JoiRequestValidator {
+  validators: JoiRouteValidator[] = [
+    {
+      route: "/conversations/:id",
+      method: "POST",
+      validatorSchema: postBodyFormat,
+    },
+    {
+      route: "/conversations/:id",
+      method: "PUT",
+      validatorSchema: putBodyFormat,
+    },
+  ];
 
-			Trouver dans la liste de validators, le validator qui correspond à la route de la requête.
-		*/
+  validate(request: Request): JoiRequestValidatorResponse {
+    const route = request.route?.path || "";
+    const method = request.method || "";
 
-		/* 
-			ETAPE 2:
+    const validator = this.validators.find(
+      (v) => v.route === route && v.method === method
+    );
 
-			Si le validator n'existe pas
-				=> retourner un objet vide.
-			Si le validator existe 
-				=> valider le body de la requête.
-				=> Si le body est valide
-					=> retourner un objet vide.
-				=> Si le body est invalide
-					=> retourner un objet avec une clé error contenant les details de l'erreur.
-		*/
-		return {};
-	}
+    if (!validator) {
+      return {};
+    }
+
+    const validationResult = validator.validatorSchema.validate(request.body, {
+      abortEarly: false,
+    });
+
+    if (!validationResult.error) {
+      return {};
+    }
+
+    const errorDetails = validationResult.error.details.map(
+      (detail) => detail.message
+    );
+
+    return { error: errorDetails.join(", ") };
+  }
 }
 
 export const JoiRequestValidatorInstance = new JoiRequestValidator();

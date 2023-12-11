@@ -3,6 +3,8 @@ import express from "express";
 import { Server } from "socket.io";
 import { Database } from "./database/database";
 import { SocketController } from "./socket/socketController";
+const conversationRoutes = require('./routes/conversationRoutes');
+const userRoutes = require('./routes/userRoutes')
 
 const app = express();
 
@@ -18,6 +20,8 @@ function makeApp(database: Database) {
   let socketController = new SocketController(io, database);
 
   app.locals.sockerController = socketController;
+  app.use('/conversation', conversationRoutes)
+	app.use('/users',userRoutes)
 
   return { app, server };
 }
