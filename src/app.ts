@@ -20,7 +20,7 @@ function makeApp(database: Database) {
   let socketController = new SocketController(io, database);
 
   app.locals.sockerController = socketController;
-  app.use('/conversation', conversationRoutes)
+  app.use('/conversations', conversationRoutes)
 	app.use('/users',userRoutes)
 
   return { app, server };

@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import ConversationModel from "./Mongo/Models/ConversationModel";
 import UserModel from "./Mongo/Models/UserModel";
 import MessageModel, { IMessage, Reactions } from "./Mongo/Models/MessageModel";
+import { pickRandom } from "../pictures";
 
 class Database {
   fromTest: boolean;
@@ -141,6 +142,7 @@ class Database {
       let user = new UserModel({
         username,
         password,
+        profilePicId: pickRandom(),
       });
 
       user = await user.save();

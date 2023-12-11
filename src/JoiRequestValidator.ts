@@ -11,31 +11,50 @@ interface JoiRouteValidator {
   validatorSchema: joi.ObjectSchema<any>;
 }
 
-const postBodyFormat = joi.object({
-  name: joi.string().min(3).max(30).required(),
-  description: joi.string().min(3).max(200),
-  price: joi.number().min(0).required(),
+const postBodyFormatForConversation = joi.object({
+  title: joi.string().min(3).max(30).required(),
+  participants: joi.array().items(joi.string().length(24)).required(),
 });
 
-const putBodyFormat = joi
+const putBodyFormatForConversation = joi
   .object({
-    name: joi.string().min(3).max(30),
-    description: joi.string().min(3).max(200),
-    price: joi.number().min(0),
+    title: joi.string().min(3).max(30),
+    participants: joi.array().items(joi.string().length(24)),
   })
-  .or("name", "description", "price");
+  .or("title", "participants");
+
+const putSeenBodyFormat = joi.object({
+  conversationId: joi.string().length(24).required(),
+  userId: joi.string().length(24).required(),
+  messageId: joi.string().length(24).required(),
+});
+
+const postUserBodyFormatForUser = joi.object({
+  username: joi.string().min(3).max(30).required(),
+  password: joi.string().min(6).required(), // Adjust the min length as needed
+});
 
 class JoiRequestValidator {
   validators: JoiRouteValidator[] = [
     {
       route: "/conversations/:id",
       method: "POST",
-      validatorSchema: postBodyFormat,
+      validatorSchema: postBodyFormatForConversation,
     },
     {
       route: "/conversations/:id",
       method: "PUT",
-      validatorSchema: putBodyFormat,
+      validatorSchema: putBodyFormatForConversation,
+    },
+    {
+      route: "/conversations/:id",
+      method: "PUT",
+      validatorSchema: putSeenBodyFormat,
+    },
+    {
+      route: "/users", // Update the route as needed
+      method: "POST",
+      validatorSchema: postUserBodyFormatForUser,
     },
   ];
 

@@ -22,7 +22,6 @@ const userSchema: Schema<IUser> = new Schema<IUser>({
 	profilePicId :
 	{
 		type : Schema.Types.ObjectId,
-		required : true
 	}
 });
 
