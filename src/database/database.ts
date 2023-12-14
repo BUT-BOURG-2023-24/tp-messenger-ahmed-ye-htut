@@ -39,15 +39,15 @@ class Database {
 
   async getAllConversationsForUser(id: MongooseID) {
     try {
-		const allConversationsForUser = await ConversationModel.find({
-		  participants: id,
-		})
-	
-		console.log(allConversationsForUser);
-		return { allConversationsForUser };
-	  } catch (error) {
-		return { error };
-	  }
+      const allConversationsForUser = await ConversationModel.find({
+        participants: id,
+      });
+
+      console.log(allConversationsForUser);
+      return { allConversationsForUser };
+    } catch (error) {
+      return { error };
+    }
   }
 
   async getConversationById(id: MongooseID) {
@@ -188,7 +188,6 @@ class Database {
     }
   }
 
-  
   async getUsersOnline(ids: MongooseID[]) {
     try {
       const users = await UserModel.find({

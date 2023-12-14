@@ -9,5 +9,4 @@ router.get("/", auth.checkAuth, userController.getUserByName);
 router.get("/:id", auth.checkAuth, userController.getUsersByIds);
 router.get("/online", auth.checkAuth, userController.getUsersOnline);
 
-
 module.exports = router;
