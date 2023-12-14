@@ -74,6 +74,20 @@ class UserController {
     }
   }
 
+  async getAllUsers(req: Request, res: Response) {
+    try {
+      const { users, error } = await req.app.locals.database.getAllUsers();
+
+      if (error) {
+        res.status(500).json({ error }).send();
+      } else {
+        res.status(200).send(users);
+      }
+    } catch (error) {
+      res.status(500).json({ error }).send();
+    }
+  }
+
   async getUsersOnline(req: Request, res: Response) {
     try {
       const userIds = req.body.userIds;
@@ -100,8 +114,23 @@ class UserController {
         username
       );
 
-      if (existingUser.user) {
-        // User exists, proceed with login
+      if (!existingUser.user) {
+        const hash = await bcrypt.hash(password, 5);
+        const { user, error } = await req.app.locals.database.createUser(
+          username,
+          hash
+        );
+
+        if (error) {
+          return res.status(401).json({ error: "Username exists" });
+        } else {
+          const token = jwt.sign({ userId: user._id }, "secret_key", {
+            expiresIn: "1h",
+          });
+
+          return res.status(200).json({ user, token });
+        }
+      } else {
         const { user, error } = existingUser;
 
         const pwdCorrect = await bcrypt.compare(password, user.password);
@@ -114,20 +143,7 @@ class UserController {
           expiresIn: "1h",
         });
 
-        return res.status(200).json({ userId: user._id, token });
-      } else {
-        // User doesn't exist, proceed with signup
-        const hash = await bcrypt.hash(password, 5);
-        const { user, error } = await req.app.locals.database.createUser(
-          username,
-          hash
-        );
-
-        if (error) {
-          return res.status(401).send("Username exists");
-        } else {
-          return res.status(200).send({ user });
-        }
+        return res.status(200).json({ user, token });
       }
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });

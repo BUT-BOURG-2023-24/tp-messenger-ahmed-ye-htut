@@ -188,6 +188,16 @@ class Database {
     }
   }
 
+  async getAllUsers(ids: MongooseID[]) {
+    try {
+      const users = await UserModel.find()
+      console.log(users);
+      return { users };
+    } catch (error) {
+      return { error };
+    }
+  }
+
   async getUsersOnline(ids: MongooseID[]) {
     try {
       const users = await UserModel.find({
