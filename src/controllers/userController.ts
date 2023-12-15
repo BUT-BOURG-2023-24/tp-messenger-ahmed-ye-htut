@@ -114,7 +114,21 @@ class UserController {
         username
       );
 
-      if (!existingUser.user) {
+      if (existingUser.user) {
+        const { user, error } = existingUser;
+
+        const pwdCorrect = await bcrypt.compare(password, user.password);
+
+        if (!pwdCorrect) {
+          return res.status(400).json({ error: "Incorrect password." });
+        }
+
+        const token = jwt.sign({ userId: user._id }, "secret_key", {
+          expiresIn: "1h",
+        });
+
+        return res.status(200).json({ user, token });
+      } else {
         const hash = await bcrypt.hash(password, 5);
         const { user, error } = await req.app.locals.database.createUser(
           username,
@@ -130,56 +144,44 @@ class UserController {
 
           return res.status(200).json({ user, token });
         }
-      } else {
-        const { user, error } = existingUser;
-
-        const pwdCorrect = await bcrypt.compare(password, user.password);
-
-        if (!pwdCorrect) {
-          return res.status(400).json({ error: "Incorrect password." });
-        }
-
-        const token = jwt.sign({ userId: user._id }, "secret_key", {
-          expiresIn: "1h",
-        });
-
-        return res.status(200).json({ user, token });
       }
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+
+  //   async login2(req: Request, res: Response) {
+
+  //     let { user } = await req.app.locals.database.getUserByName(req.body.username);
+
+  //     if (user && user.username) {
+  //         let pwdCorrect = await bcrypt.compare(req.body.password, user.password);
+  //         if (!pwdCorrect)
+  //             return res.status(400).json({ error: "Incorrect password." });
+
+  //         const token = jwt.sign({ userId: user._id }, "secret_key", {
+  //             expiresIn: "1h",
+  //         });
+
+  //         res.status(200).json({ userId: user._id, token: token });
+  //     }
+  //     else if (!user || !user.username) {
+
+  //         let hash = await bcrypt.hash(req.body.password, 5);
+
+  //         let { user, error } = await req.app.locals.database.createUser(
+  //             req.body.username,
+  //             hash,
+  //         );
+
+  //         if (error) {
+  //             res.status(401).send("error creation in db");
+  //         } else {
+  //             res.status(200).send({ user });
+  //         }
+  //     }
+  // }
 }
-
-// async function login2(req: Request, res: Response) {
-//   let { user } = await req.app.locals.database.getUser(req.body.username);
-
-//   if (user && user.username) {
-//     let pwdCorrect = await bcrypt.compare(req.body.password, user.password);
-//     if (!pwdCorrect)
-//       return res.status(400).json({ error: "Incorrect password." });
-
-//     const token = jwt.sign({ userId: user._id }, "secret_key", {
-//       expiresIn: "1h",
-//     });
-
-//     res.status(200).json({ userId: user._id, token: token });
-//   } else if (!user || !user.username) {
-//     let hash = await bcrypt.hash(req.body.password, 5);
-
-//     let { user, error } = await req.app.locals.database.createUser(
-//       req.body.username,
-//       hash,
-//       pickRandom()
-//     );
-
-//     if (error) {
-//       res.status(401).send("error creation in db");
-//     } else {
-//       res.status(200).send({ user });
-//     }
-//   }
-// }
 
 const userController = new UserController();
 export default userController;
