@@ -5,7 +5,7 @@ async function checkAuth(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization as string;
 
   if (!token) {
-    return res.status(401).json({ error: "Need a token!" });
+    return res.status(401).json({ error: "Need a token yehtuu!" });
   }
 
   try {

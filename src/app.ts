@@ -15,13 +15,14 @@ function makeApp(database: Database) {
 
   const server = http.createServer(app);
   app.use(express.json());
+  app.use('/conversations', conversationRoutes)
+	app.use('/users',userRoutes)
 
   const io = new Server(server, { cors: { origin: "*" } });
   let socketController = new SocketController(io, database);
 
   app.locals.sockerController = socketController;
-  app.use('/conversations', conversationRoutes)
-	app.use('/users',userRoutes)
+  
 
   return { app, server };
 }

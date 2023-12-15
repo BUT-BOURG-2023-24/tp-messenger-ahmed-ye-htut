@@ -146,7 +146,8 @@ class Database {
       });
 
       user = await user.save();
-      return { user };
+
+      return { user};
     } catch (error) {
       return { error };
     }
@@ -188,7 +189,7 @@ class Database {
     }
   }
 
-  async getAllUsers(ids: MongooseID[]) {
+  async getAllUsers() {
     try {
       const users = await UserModel.find()
       console.log(users);
